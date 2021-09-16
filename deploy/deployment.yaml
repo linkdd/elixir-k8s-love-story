@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-elixir-app
+  namespace: default
+  labels:
+    app.kubernetes.io/name: my-elixir-app
+    app.kubernetes.io/instance: myapp-cluster
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-elixir-app
+      app.kubernetes.io/instance: myapp-node
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: my-elixir-app
+        app.kubernetes.io/instance: myapp-node
+    spec:
+      containers:
+        - name: main
+          image: myapp:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RELEASE_NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: RELEASE_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: my-elixir-app-cluster
+                  key: ERLANG_COOKIE
+          ports:
+            - name: epmd
+              containerPort: 4369
+              protocol: TCP

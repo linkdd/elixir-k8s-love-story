@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-elixir-app-svc-headless
+  namespace: default
+  labels:
+    app.kubernetes.io/name: my-elixir-app
+    app.kubernetes.io/instance: myapp-svc-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 4369
+      targetPort: epmd
+      protocol: TCP
+      name: epmd
+  selector:
+    app.kubernetes.io/name: my-elixir-app
+    app.kubernetes.io/instance: myapp-node
